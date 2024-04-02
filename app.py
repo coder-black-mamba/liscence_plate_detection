@@ -2,13 +2,17 @@ from ultralytics import YOLO
 import easyocr
 import cv2
 from flask import Flask, render_template, request, redirect, url_for
-import os
+import os 
+import time
 
 app = Flask(__name__)
 
 # Set upload folder
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
@@ -63,13 +67,29 @@ def upload_success():
         #         cv2.imwrite(output_path, cropped_img)
         #         print(f"Largest image saved at {output_path}")
         #         break
+        # reader = easyocr.Reader(['bn'], gpu = False)
+        # result = reader.readtext("./static/uploads/processed.jpg", detail = 0, paragraph = True)
+        # print(result)
+        # return render_template('index.html', message=result[0])
+        time.sleep(2)
+        print("detection and cropping is successfull. ")
+        return redirect('/final_result/')
+    except Exception as e :
+        print(e)
+        return render_template('error.html')
+
+@app.route('/final_result/')
+def final_result():
+    try:
+        print("Now easy ocr part.")
         reader = easyocr.Reader(['bn'], gpu = False)
         result = reader.readtext("./static/uploads/processed.jpg", detail = 0, paragraph = True)
         print(result)
         return render_template('index.html', message=result[0])
     except Exception as e :
-        print(e)
         return render_template('error.html')
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
