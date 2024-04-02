@@ -30,31 +30,34 @@ def upload_success():
     # file name is the file name that some one uploaded 
     # so the image path will be ./static/uploads/<filename>
     # call your model with keras tf of sklearn
-    model = YOLO('./static/model/yolov8-custom.pt')
-    confidence = 0.6 # 0.0-1.0    # render the message that you wanted to show in message variable
-    results = model.predict(source = f"./static/uploads/input.jpg", save = True, show = False, conf = confidence)
-    print(results)
+    try:
+        model = YOLO('./static/model/yolov8-custom.pt')
+        confidence = 0.6 # 0.0-1.0    # render the message that you wanted to show in message variable
+        results = model.predict(source = f"./static/uploads/input.jpg", save = True, show = False, conf = confidence)
+        print(results)
 
-    img_main = cv2.imread("./static/uploads/input.jpg")
-# for all obj
-    for r in results:
-        boxes = r.boxes
-        for box in boxes:
-            # Find Bounding Box
-            [left, top, right, bottom] = box.xyxy[0]
-            left = int(left)
-            top = int(top)
-            right = int(right)
-            bottom = int(bottom)
-            cropped_img = img_main[top+1:bottom-1, left+1:right-1]
-            output_path = "./static/uploads/processed.jpg"
-            cv2.imwrite(output_path, cropped_img)
-            print(f"Largest image saved at {output_path}")
-            break
-    reader = easyocr.Reader(['bn'], gpu = False)
-    result = reader.readtext("./static/uploads/processed.jpg", detail = 0, paragraph = True)
-    print(result)
-    return render_template('index.html', message=result[0])
+        img_main = cv2.imread("./static/uploads/input.jpg")
+    # for all obj
+        for r in results:
+            boxes = r.boxes
+            for box in boxes:
+                # Find Bounding Box
+                [left, top, right, bottom] = box.xyxy[0]
+                left = int(left)
+                top = int(top)
+                right = int(right)
+                bottom = int(bottom)
+                cropped_img = img_main[top+1:bottom-1, left+1:right-1]
+                output_path = "./static/uploads/processed.jpg"
+                cv2.imwrite(output_path, cropped_img)
+                print(f"Largest image saved at {output_path}")
+                break
+        reader = easyocr.Reader(['bn'], gpu = False)
+        result = reader.readtext("./static/uploads/processed.jpg", detail = 0, paragraph = True)
+        print(result)
+        return render_template('index.html', message=result[0])
+    except:
+        return render_template('error.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
