@@ -1,7 +1,7 @@
 from ultralytics import YOLO 
 import easyocr
 import cv2
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for,jsonify
 import os 
 import time
 
@@ -89,7 +89,16 @@ def final_result():
     except Exception as e :
         return render_template('error.html')
 
-
+@app.route('/dmp_fix/')
+def dmp_fix():
+    try:
+        print("Now easy ocr part.")
+        reader = easyocr.Reader(['bn'], gpu = False)
+        result = reader.readtext("./static/uploads/processed.jpg", detail = 0, paragraph = True)
+        print(result)
+        return jsonify(result)
+    except Exception as e :
+        return jsonify(e)
 
 if __name__ == '__main__':
     app.run(debug=True)
