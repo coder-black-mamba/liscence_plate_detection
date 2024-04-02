@@ -56,7 +56,8 @@ def upload_success():
         result = reader.readtext("./static/uploads/processed.jpg", detail = 0, paragraph = True)
         print(result)
         return render_template('index.html', message=result[0])
-    except:
+    except Exception as e :
+        print(e)
         return render_template('error.html')
 
 if __name__ == '__main__':
